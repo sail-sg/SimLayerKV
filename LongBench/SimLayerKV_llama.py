@@ -283,13 +283,7 @@ class LlamaDecoderLayer(nn.Module):
         residual = hidden_states
 
         hidden_states = self.input_layernorm(hidden_states)
-        if kwargs != None:
-            if 'threshold_stream' in kwargs:
-                stream_flag = False
-                if kwargs['threshold_stream'] == 6:
-                    kwargs['select'] = 'full'
-                if kwargs['threshold_stream'] == 7:
-                    kwargs['select'] = 'last'
+        
         if stream_flag == False:
             hidden_states, self_attn_weights, present_key_value, bos_prob = self.self_attn.ori_forward(
                 hidden_states=hidden_states,
@@ -454,15 +448,12 @@ class LlamaModel(modeling_llama.LlamaPreTrainedModel):
             if output_attentions:
                 all_self_attns += (layer_outputs[1],)
         hidden_states = self.norm(hidden_states)
-        bos_probs = 0
+        
         # [SimLayerKV]
         if (torch.tensor(bos_probs).sum() != 0) & (torch.tensor(bos_weights).sum()==0):
             # print(hidden_states.shape[1])
             for layer_num in range(len(bos_probs)):
-                
                 if threshold_stream< 2:
-                    if (layer_num > len(bos_probs)-2)&(threshold_stream!=0):
-                        continue
                     if bos_probs[layer_num] >threshold_stream:
                         # print(layer_num)
                         next_decoder_cache.key_cache[layer_num] = torch.cat([next_decoder_cache.key_cache[layer_num][:, :, 0:4],next_decoder_cache.key_cache[layer_num][:, :, -1024:]], dim=-2)
