@@ -255,7 +255,7 @@ class LlamaDecoderLayer(nn.Module):
         use_cache: Optional[bool] = False,
         cache_position: Optional[torch.LongTensor] = None,
         position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  # will become mandatory in v4.45
-        stream_flag: Optional[bool] = False,
+        flash_flag: Optional[bool] = False,
         **kwargs,
     ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
         """
@@ -284,7 +284,7 @@ class LlamaDecoderLayer(nn.Module):
 
         hidden_states = self.input_layernorm(hidden_states)
         
-        if stream_flag == False:
+        if flash_flag == False:
             hidden_states, self_attn_weights, present_key_value, bos_prob = self.self_attn.ori_forward(
                 hidden_states=hidden_states,
                 attention_mask=attention_mask,
@@ -404,11 +404,6 @@ class LlamaModel(modeling_llama.LlamaPreTrainedModel):
             layer_num += 1
             if output_hidden_states:
                 all_hidden_states += (hidden_states,)
-
-            if  hidden_states.shape[1] != 1:
-                stream_flag = True
-            else:
-                stream_flag = False
             if self.gradient_checkpointing and self.training:
                 layer_outputs = self._gradient_checkpointing_func(
                     decoder_layer.__call__,
@@ -431,7 +426,6 @@ class LlamaModel(modeling_llama.LlamaPreTrainedModel):
                     use_cache=use_cache,
                     cache_position=cache_position,
                     position_embeddings=position_embeddings,
-                    stream_flag = False,
                     threshold_stream = threshold_stream
                 )
 
@@ -580,7 +574,6 @@ class LlamaModel(modeling_llama.LlamaPreTrainedModel):
                     use_cache=use_cache,
                     cache_position=cache_position,
                     position_embeddings=position_embeddings,
-                    # stream_flag = stream_flag,
                 )
 
                 try:
