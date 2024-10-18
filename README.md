@@ -21,12 +21,14 @@ We show examples of one model. By simply changing the model's name, the approach
 **1. Try our SimLayerKV**
    
 ```
+cd LongBench
 python pred.py --model  llama3-8b-chat --type SimLayerKV
 ```
 
 **2. Try our SimLayerKV with 4-bit quatization**
 
 ```
+cd LongBench
 python pred.py --model  llama3-8b-chat --type kivi_SimLayerKV
 ```
 
