@@ -20,7 +20,7 @@ from transformers.generation.utils import logging, NEED_SETUP_CACHE_CLASSES_MAPP
 from transformers.models.qwen2.configuration_qwen2 import Qwen2Config
 from transformers.models.llama import modeling_llama
 from transformers.models.qwen2 import modeling_qwen2
-from attention_sink_stream_attention_qwen import ori_forward
+from SimLayerKV_attention_qwen import ori_forward
 from transformers.cache_utils import Cache,DynamicCache, StaticCache
 
 from transformers.modeling_outputs import BaseModelOutputWithPast,CausalLMOutputWithPast
