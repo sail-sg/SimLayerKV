@@ -3,7 +3,7 @@
     "llama2-7b-chat-4k": "meta-llama/Llama-2-7b-chat-hf",
     "llama3-8b-chat": "meta-llama/Meta-Llama-3-8B-Instruct",
     "mistral-7b-chat":"mistralai/Mistral-7B-Instruct-v0.3",
-    "qwen2-7b-chat":"Qwen/Qwen2.5-3B-Instruct",
+    "qwen2-3b-chat":"Qwen/Qwen2.5-3B-Instruct",
     "longchat-v1.5-7b-32k": "lmsys/longchat-7b-v1.5-32k",
     "xgen-7b-8k": "Salesforce/xgen-7b-8k-inst",
     "internlm-7b-8k": "internlm/internlm-chat-7b-8k",
