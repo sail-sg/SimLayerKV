@@ -15,7 +15,6 @@ def parse_args(args=None):
     parser.add_argument('--model', type=str, default=None, choices=["llama2-7b-chat-4k", "longchat-v1.5-7b-32k", "llama3-8b-chat", "xgen-7b-8k", "internlm-7b-8k", "chatglm2-6b", "chatglm2-6b-32k", "chatglm3-6b-32k", "vicuna-v1.5-7b-16k", "mistral-7b-chat","qwen2-3b-chat",'longchat-7b','yi-9b-chat'])
     parser.add_argument('--e', action='store_true', help="Evaluate on LongBench-E")
     parser.add_argument('--type',  type=str, default='vanilla')
-    parser.add_argument('--window_size',  type=float, default=1024)
     return parser.parse_args(args)
 
 # This is the customized building prompt for chat models
