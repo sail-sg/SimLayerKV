@@ -10,6 +10,28 @@ Recent advancements in LLMs have extended their capabilities to handle long cont
 
 ## Setup
 
+```
+pip install -r requirement.txt
+```
+
+## Quick Start
+We show examples of one model. By simply changing the model's name, the approach can be applied to other models.
+
+
+**1. Try our SimLayerKV**
+   
+```
+python pred.py --model  llama3-8b-chat --type SimLayerKV
+```
+
+**2. Try our SimLayerKV with 4-bit quatization**
+
+```
+python pred.py --model  llama3-8b-chat --type kivi_SimLayerKV
+```
+
+
+
 ## Reference Repositories
 
 - LongBench [https://github.com/THUDM/LongBench](https://github.com/THUDM/LongBench)
