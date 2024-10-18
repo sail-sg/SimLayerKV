@@ -51,7 +51,7 @@ def post_process(response, model_name):
 
 def get_pred(rank, world_size, data, max_length, max_gen, prompt_format, dataset, device, model_name, model2path, out_path):
     device = torch.device(f'cuda:{rank}')
-    if (('contrastive' in out_path) or ('stream' in out_path) or ('try' in out_path)or ('minicache' in out_path)) & ('kivi' not in out_path):
+    if (('SimLayerKV' in out_path) or ('stream' in out_path) or ('try' in out_path)or ('minicache' in out_path)) & ('kivi' not in out_path):
         from transformers.models.llama import modeling_llama
         from transformers import GenerationMixin
         from SimLayerKV_llama import _sample,LlamaDecoderLayer,LlamaModel,LlamaForCausalLM
