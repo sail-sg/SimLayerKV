@@ -55,8 +55,8 @@ def get_pred(rank, world_size, data, max_length, max_gen, prompt_format, dataset
     if (('contrastive' in out_path) or ('stream' in out_path) or ('try' in out_path)or ('minicache' in out_path)) & ('kivi' not in out_path):
         from transformers.models.llama import modeling_llama
         from transformers import GenerationMixin
-        from attention_sink_drop import _sample,LlamaDecoderLayer,LlamaModel,LlamaForCausalLM
-        from attention_sink_qwen import Qwen2DecoderLayer,Qwen2Model,Qwen2ForCausalLM
+        from SimLayerKV_llama import _sample,LlamaDecoderLayer,LlamaModel,LlamaForCausalLM
+        from SimLayerKV_qwen import Qwen2DecoderLayer,Qwen2Model,Qwen2ForCausalLM
         modeling_llama.LlamaDecoderLayer = LlamaDecoderLayer
         if ('minicache' in out_path):
             modeling_llama.LlamaModel.forward = LlamaModel.minicache_forward
@@ -67,14 +67,14 @@ def get_pred(rank, world_size, data, max_length, max_gen, prompt_format, dataset
         modeling_qwen2.Qwen2DecoderLayer.forward  = Qwen2DecoderLayer.forward 
         modeling_qwen2.Qwen2Model.forward = Qwen2Model.forward
         modeling_qwen2.Qwen2ForCausalLM.forward = Qwen2ForCausalLM.forward
-        from attention_sink_stream_attention_qwen import ori_forward
-        modeling_qwen2.QWEN2_ATTENTION_CLASSES["flash_attention_2"].forward = ori_forward
-        modeling_qwen2.QWEN2_ATTENTION_CLASSES["eager"].forward = ori_forward
-        modeling_qwen2.QWEN2_ATTENTION_CLASSES["sdpa"].forward = ori_forward
+        from SimLayerKV_stream_attention_qwen import attn_forward
+        modeling_qwen2.QWEN2_ATTENTION_CLASSES["flash_attention_2"].forward = attn_forward
+        modeling_qwen2.QWEN2_ATTENTION_CLASSES["eager"].forward = attn_forward
+        modeling_qwen2.QWEN2_ATTENTION_CLASSES["sdpa"].forward = attn_forward
         GenerationMixin._sample = _sample
     if 'snapkv' in out_path:
         from snapkv.monkeypatch.monkeypatch import replace_llama, replace_mistral, replace_mixtral, replace_qwen
-        compress_args = json.load(open('/home/aiops/zhangxuan/longbench/LongBench/config/ablation_c1024_w32_k7_maxpool.json', "r"))
+        compress_args = json.load(open('config/ablation_c1024_w32_k7_maxpool.json', "r"))
         compress = True
         replace_llama()
         replace_qwen()
@@ -305,19 +305,15 @@ if __name__ == '__main__':
         datasets = ["narrativeqa", "qasper", "multifieldqa_en", "multifieldqa_zh", "hotpotqa", "2wikimqa", "musique", \
                     "dureader", "gov_report", "qmsum", "multi_news", "vcsum", "trec", "triviaqa", "samsum", "lsht", \
                     "passage_count", "passage_retrieval_en", "passage_retrieval_zh", "lcc", "repobench-p"]
-    if args.type == 'try':
-        datasets = ['narrativeqa',"dureader",'lsht']
+
     # we design specific prompt format and max generation length for each task, feel free to modify them to optimize model output
     dataset2prompt = json.load(open("config/dataset2prompt.json", "r"))
     dataset2maxlen = json.load(open("config/dataset2maxlen.json", "r"))
     # predict on each dataset
-    if not os.path.exists("pred_as"):
-        os.makedirs("pred_as")
-    if not os.path.exists("pred_as_e"):
-        os.makedirs("pred_as_e")
-    if ('pyramid' in args.type) or ('try' in args.type):
-        if 'try8' not in args.type:
-            datasets = ["dureader", "musique"]#, "hotpotqa","multifieldqa_en"]
+    if not os.path.exists("pred"):
+        os.makedirs("pred")
+    if not os.path.exists("pred_e"):
+        os.makedirs("pred_e")
     for dataset in datasets:
         print(dataset)
         
@@ -339,9 +335,9 @@ if __name__ == '__main__':
                 os.makedirs(f"pred_e/{write_model_name}")
             out_path = f"pred_e/{write_model_name}/{dataset}.jsonl"
           
-        if not os.path.exists(f"pred_as/{model_name}/{args.type}"):
-            os.makedirs(f"pred_as/{model_name}/{args.type}")
-            out_path = f"pred_as/{model_name}/{args.type}/{dataset}.jsonl"
+        if not os.path.exists(f"pred/{model_name}/{args.type}"):
+            os.makedirs(f"pred/{model_name}/{args.type}")
+            out_path = f"pred/{model_name}/{args.type}/{dataset}.jsonl"
         prompt_format = dataset2prompt[dataset]
         max_gen = dataset2maxlen[dataset]
         data_all = [data_sample for data_sample in data]
