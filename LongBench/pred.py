@@ -7,7 +7,6 @@ from tqdm import tqdm
 import numpy as np
 import random
 import argparse
-from llama_flash_attn_monkey_patch import replace_llama_attn_with_flash_attn
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
@@ -236,7 +235,6 @@ def load_model_and_tokenizer(path, model_name, device,compress,out_path = ''):
         model = LlamaForCausalLM.from_pretrained(path, trust_remote_code=True, torch_dtype=torch.bfloat16, use_flash_attention_2=compress).to(device)
     elif ("llama" in model_name) or ('mistral' in model_name):
 
-        # replace_llama_attn_with_flash_attn()
         if 'llama' in out_path:
             tokenizer = AutoTokenizer.from_pretrained(path)
         else:
